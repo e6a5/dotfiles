@@ -1,4 +1,6 @@
--- ~/.config/nvim/init.lua
+
+require("autocmds")
+
 
 -- Set <leader> key (optional, but common)
 vim.g.mapleader = ' '
@@ -56,5 +58,6 @@ require("lazy").setup({
 -- This line should be after the require("lazy").setup block
 vim.cmd.colorscheme("tokyonight-storm")
 
--- Any other final configuration that doesn't strictly belong in plugin specs
--- For example, global autocommands, keymaps that don't fit elsewhere, etc.
+-- Load custom keymaps
+require("keymaps")
+

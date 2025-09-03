@@ -19,56 +19,34 @@ return {
       require("nvim-tree").setup({})
     end,
   },
+  
   {
     "neovim/nvim-lspconfig",
-    ft = "go", -- Attach specifically to Go filetypes
+    ft = { "go", "gomod" },
     config = function()
       require("lspconfig").gopls.setup({
         on_attach = function(client, bufnr)
-          vim.api.nvim_create_autocmd("BufEnter", {
-            buffer = bufnr,
-            callback = function()
-              print("gopls attached!") -- Print a message when attached
-            end,
-          })
-          -- You can add other keymaps or autocommands here if needed
+          print("✅ gopls attached!")
+
+          -- Optional keymaps
+          local opts = { buffer = bufnr }
+          vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
         end,
-        -- Add any specific gopls settings here if necessary
         settings = {
           gopls = {
             analyses = {
               unusedparams = true,
             },
             staticcheck = true,
+            usePlaceholders = true,
           },
         },
-        on_attach = function(client, bufnr)
-         vim.api.nvim_create_autocmd("BufEnter", {
-                buffer = bufnr,
-                callback = function()
-                        print("gopls attached!") -- Print a message when attached
-                end,
-         })
-        -- Key mappings can go here
-        vim.keymap.set('i', '<C-Space>', vim.lsp.buf.completion, { buffer = bufnr, desc = 'Trigger Completion' })
-        end,
-        settings = {
-         golang = {
-          gopls = {
-                analyses = {
-                        unusedparams = true,
-                },
-                staticcheck = true,
-                completion = {
-                        usePlaceholders = true, -- Explicitly set this (often default)
-                },
-          },
-         },
-        },
-        })
-      end,
+      })
+    end,
   },
-
+  
   -- LSP, Treesitter, DAP, and Go plugins: Loaded when a Go filetype is detected
   {
     "ray-x/go.nvim",
@@ -85,11 +63,7 @@ return {
         go_fmt = "gofumpt", -- or "golines", make sure the tool is installed
         go_lint = "golangci-lint", -- requires golangci-lint to be installed and in PATH
         goimports = 'gopls',
-        -- If you want to use gopls for formatting, set go_fmt to 'gopls'
-        -- Example of potentially useful go.nvim settings:
-        -- goimports = 'gopls', -- Use gopls for organizing imports
-        -- lsp_diagnostic_signs = true, -- Enable signs for LSP diagnostics
-        -- dap_debug = true, -- Enable DAP debugging integration
+        lsp_cfg = false, -- ✅ Let us control gopls manually
       })
     end,
     -- Load when a Go filetype is detected for LSP and other features
@@ -100,41 +74,19 @@ return {
   },
 
   -- Explicit nvim-treesitter configuration for highlighting and other features
-  -- It's good practice to have this separate from the go.nvim dependency
   {
     "nvim-treesitter/nvim-treesitter",
-    -- build command to update parsers
     build = ":TSUpdate",
     config = function()
       require("nvim-treesitter.configs").setup({
-        -- Ensure the Go parser is installed
-        ensure_installed = { "go", "lua", "vimdoc", "query" }, -- Add other languages you use
-
-        -- Enable syntax highlighting
+        ensure_installed = { "go", "lua", "vimdoc", "query" },
         highlight = { enable = true },
-        -- Enable indentation
         indent = { enable = false },
-
-        -- Optional: Configure textobjects (requires nvim-treesitter-textobjects)
-        -- textobjects = {
-        --   select = {
-        --     enable = true,
-        --     lookahead = true, -- Older versions of nvim-treesitter may need this
-        --     keymaps = {
-        --       -- You can use the capture groups defined in textobjects.scm
-        --       ["af"] = "@function.outer",
-        --       ["if"] = "@function.inner",
-        --       ["ac"] = "@class.outer",
-        --       ["ic"] = "@class.inner",
-        --       -- Add more textobjects as needed
-        --     },
-        --   },
-        --   -- Add other textobject modules like 'move' or 'swap' here
-        -- },
       })
     end,
   },
--- Autocompletion: Setup nvim-cmp and its sources
+
+  -- Autocompletion: Setup nvim-cmp and its sources
   {
     "hrsh7th/nvim-cmp",
     dependencies = {
@@ -146,30 +98,24 @@ return {
       "hrsh7th/cmp-cmdline", -- Optional: Cmdline completion
     },
     config = function()
-      print("cmp setup called") -- First line in the config function
+      print("cmp setup called")
       local cmp = require("cmp")
       local luasnip = require("luasnip")
 
       cmp.setup({
-        -- Enable LSP snippets
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)
           end,
         },
-        -- Key mappings
         mapping = cmp.mapping.preset.insert({
-          ['<C-Space>'] = cmp.mapping.complete(), -- Trigger completion
-          ['<C-e>'] = cmp.mapping.abort(),       -- Abort completion
-          ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept selected item
+          ['<C-Space>'] = cmp.mapping.complete(),
+          ['<C-e>'] = cmp.mapping.abort(),
+          ['<CR>'] = cmp.mapping.confirm({ select = true }),
           ['<C-j>'] = cmp.mapping.select_next_item(),
           ['<C-k>'] = cmp.mapping.select_prev_item(),
-
-          -- Scroll documentation
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
-
-          -- Navigate snippets with tab/shift-tab (consistent with README)
           ['<Tab>'] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_next_item()
@@ -189,21 +135,18 @@ return {
             end
           end, { 'i', 's' }),
         }),
-        -- Sources for completion
         sources = cmp.config.sources({
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'buffer' },
           { name = 'path' },
-          { name = 'cmdline' }, -- Enable cmdline completion
+          { name = 'cmdline' },
         }),
-        -- Behavior during completion
         completion = {
           completeopt = 'menu,menuone,noselect',
         },
       })
 
-      -- Setup command line completion (optional)
       cmp.setup.cmdline(':', {
         sources = cmp.config.sources({
           { name = 'path' },
@@ -211,17 +154,70 @@ return {
         })
       })
     end,
-    event = "VeryLazy", -- Load when entering insert mode
-  },
-  -- Other utility plugins
-  { "nvim-lua/plenary.nvim" }, -- Utility library, dependency for many plugins
-  { "nvim-telescope/telescope.nvim", tag = "0.1.5", dependencies = { "nvim-lua/plenary.nvim" } }, -- Fuzzy finder
-  { "hoob3rt/lualine.nvim" }, -- Status line
-  { "joshuavial/aider.nvim" }, -- Optional: AI assistant
-  {
-    "christoomey/vim-tmux-navigator", -- Seamless navigation between Neovim and Tmux panes
-    lazy = false  -- Load immediately for smooth navigation
+    event = "VeryLazy",
   },
 
-  -- Add any other plugin specifications here following the same format { "owner/repo", ... }
+  -- Git signs for visual change indicators (NEW)
+ {
+   "tpope/vim-fugitive",
+   lazy = false, -- load at startup (tiny plugin, no cost)
+  },
+  -- Enhanced notifications (NEW)
+  {
+    'rcarriga/nvim-notify',
+    config = function()
+      vim.notify = require('notify')
+      require('notify').setup({
+        stages = 'fade_in_slide_out',
+        timeout = 3000,
+        max_height = function()
+          return math.floor(vim.o.lines * 0.75)
+        end,
+        max_width = function()
+          return math.floor(vim.o.columns * 0.75)
+        end,
+      })
+    end
+  },
+
+  -- Other utility plugins
+  { "nvim-lua/plenary.nvim" },
+  { "nvim-telescope/telescope.nvim", tag = "0.1.5", dependencies = { "nvim-lua/plenary.nvim" } },
+  {
+    "christoomey/vim-tmux-navigator",
+    lazy = false
+  },
+  {
+  "hoob3rt/lualine.nvim",
+  config = function()
+    local function lsp_status()
+      local buf_clients = vim.lsp.get_active_clients({ bufnr = 0 })
+      if next(buf_clients) == nil then
+        return "" -- no LSP attached
+      end
+      local names = {}
+      for _, client in pairs(buf_clients) do
+        table.insert(names, client.name)
+      end
+      return " " .. table.concat(names, ",")
+    end
+
+    require('lualine').setup {
+      options = {
+        theme = 'tokyonight',
+        section_separators = { left = '', right = '' },
+        component_separators = { left = '', right = '' },
+        globalstatus = true, -- one statusline across all splits
+      },
+      sections = {
+        lualine_a = { 'mode' },
+        lualine_b = { 'branch' },
+        lualine_c = { 'filename', lsp_status },
+        lualine_x = { 'encoding', 'fileformat', 'filetype' },
+        lualine_y = { 'progress' },
+        lualine_z = { 'location' },
+      },
+    }
+  end,
+ }
 }

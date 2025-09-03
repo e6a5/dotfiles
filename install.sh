@@ -3,6 +3,9 @@
 set -e
 
 echo "🚀 Starting dotfiles installation..."
+# Step 0: Bootstrap lazy.nvim plugin manager
+echo "📥 Bootstrapping lazy.nvim..."
+git clone https://github.com/folke/lazy.nvim.git ~/.config/nvim/lazy/lazy.nvim 2>/dev/null || echo "Already installed."
 
 # 1. Install Go tools
 echo "🔧 Installing Go developer tools..."
