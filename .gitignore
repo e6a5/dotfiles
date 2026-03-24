@@ -1,0 +1,5 @@
+# lazy.nvim is bootstrapped by init.lua on first launch
+nvim/lazy/
+
+# accidental nested directory
+nvim/nvim

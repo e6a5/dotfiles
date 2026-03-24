@@ -6,21 +6,15 @@ require("autocmds")
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Define the path where lazy.nvim is installed (using expand to handle ~)
--- IMPORTANT: This path must match exactly where you cloned the lazy.nvim repository
-local lazypath = vim.fn.expand("~/.config/nvim/lazy/lazy.nvim")
-
--- Check if lazy.nvim exists at the specified path
--- (You might not need the git clone part anymore if you manually cloned it,
--- but keeping the check is harmless)
+-- Bootstrap lazy.nvim: auto-clone if not present
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
-  -- Optional: Add a print statement or error here if lazy.nvim is not found
-  -- print("Error: lazy.nvim not found at " .. lazypath)
-  -- return -- Or handle the error appropriately
-  -- If you want to keep the automatic cloning, use the original lazypath definition
-  -- and delete the manually cloned directory.
-  print("lazy.nvim not found at " .. lazypath .. ". Please ensure it's cloned there.")
-  return -- Exit the script if lazy.nvim is not found
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable",
+    lazypath,
+  })
 end
 
 -- Add lazy.nvim to Neovim's runtime path

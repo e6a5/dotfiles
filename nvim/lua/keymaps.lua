@@ -54,15 +54,15 @@ map('n', '<leader>cq', function()
 end, { desc = 'Close Claude sidebar', silent = true })
 
 
--- Git (Fugitive)
-map('n', '<leader>gs', ':Git<CR>', { desc = 'Git status (Fugitive)' })
-map('n', '<leader>gb', ':Git blame<CR>', { desc = 'Git blame' })
+-- Git (Fugitive) — interactive operations
+map('n', '<leader>gs', ':Git<CR>',        { desc = 'Git status (Fugitive)' })
+map('n', '<leader>gb', ':Git blame<CR>',  { desc = 'Git blame' })
 map('n', '<leader>gd', ':Gdiffsplit<CR>', { desc = 'Git diff current file' })
 map('n', '<leader>gc', ':Git commit<CR>', { desc = 'Git commit' })
-map('n', '<leader>gp', ':Git push<CR>', { desc = 'Git push' })
+map('n', '<leader>gp', ':Git push<CR>',   { desc = 'Git push' })
 
--- Telescope Git pickers
-map('n', '<leader>gs', tb.git_status,   { desc = 'Git status' })
-map('n', '<leader>gc', tb.git_commits,  { desc = 'Git commits' })
-map('n', '<leader>gb', tb.git_branches, { desc = 'Git branches' })
-map('n', '<leader>gf', tb.git_files,    { desc = 'Git files' })
+-- Telescope Git pickers — browse/search
+map('n', '<leader>gS', tb.git_status,   { desc = 'Telescope: git status' })
+map('n', '<leader>gL', tb.git_commits,  { desc = 'Telescope: git log' })
+map('n', '<leader>gB', tb.git_branches, { desc = 'Telescope: git branches' })
+map('n', '<leader>gf', tb.git_files,    { desc = 'Telescope: git files' })

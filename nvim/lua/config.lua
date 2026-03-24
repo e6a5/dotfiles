@@ -66,8 +66,6 @@ return {
         lsp_cfg = false, -- ✅ Let us control gopls manually
       })
     end,
-    -- Load when a Go filetype is detected for LSP and other features
-    event = {"FileType"},
     ft = {"go", 'gomod'},
     -- Command to install/update necessary Go binaries used by go.nvim
     build = ':lua require("go.install").update_all_sync()',
@@ -98,7 +96,6 @@ return {
       "hrsh7th/cmp-cmdline", -- Optional: Cmdline completion
     },
     config = function()
-      print("cmp setup called")
       local cmp = require("cmp")
       local luasnip = require("luasnip")
 
@@ -140,7 +137,6 @@ return {
           { name = 'luasnip' },
           { name = 'buffer' },
           { name = 'path' },
-          { name = 'cmdline' },
         }),
         completion = {
           completeopt = 'menu,menuone,noselect',
