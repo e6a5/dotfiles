@@ -1,11 +1,11 @@
 # dotfiles
 
-Personal development environment configuration with:
+Personal development environment configuration for macOS, focused on Go development.
 
 - Neovim (Lazy.nvim-based, Go-focused)
-- Tmux integration with seamless navigation
-- Auto-setup script (`install.sh`)
-- Icon support via Nerd Fonts
+- Tmux with seamless Neovim split navigation
+- One-command install script (`install.sh`)
+- JetBrainsMono Nerd Font (auto-installed)
 
 ---
 
@@ -14,53 +14,66 @@ Personal development environment configuration with:
 ```bash
 git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-chmod +x install.sh  # Ensure it's executable
 ./install.sh
 ```
 
-This will:
+The script will:
 
-- Install Go tools (gopls, gofumpt, golangci-lint, dlv)
-- Symlink your Neovim config to ~/.config/nvim
-- Auto-install Neovim plugins with Lazy.nvim
-- Update Treesitter parsers
+1. Install Homebrew (if not already installed)
+2. Install system dependencies: `neovim`, `git`, `go`, `ripgrep`, `fd`, `fzf`, `node`, `tmux`
+3. Install Go developer tools: `gopls`, `gofumpt`, `golangci-lint`, `dlv`
+4. Install JetBrainsMono Nerd Font via Homebrew Cask
+5. Symlink `nvim/` → `~/.config/nvim` (backs up existing config to `~/.config/nvim.bak`)
+6. Symlink `tmux.conf` → `~/.tmux.conf`
+7. Install Neovim plugins via Lazy.nvim
+8. Update Treesitter parsers
+9. Install go.nvim binaries
 
-Run go.nvim tool installation
+After install, set **JetBrainsMonoNL Nerd Font** in your terminal font settings and run `:checkhealth` in Neovim.
+
+---
 
 ## Requirements
-- Go installed and added to $PATH
-- Neovim 0.9+ installed
-- Nerd Font (see below)
-- Tmux (optional but recommended)
+
+- macOS (uses Homebrew and `pbcopy`)
+- Nerd Font-capable terminal (iTerm2, Kitty, Wezterm, etc.)
+
+Go and Neovim are installed automatically by the script.
+
+---
 
 ## Neovim Configuration
-The nvim/ folder contains your full config:
-- Plugin manager: lazy.nvim
-- LSP: gopls with nvim-lspconfig
-- Completion: nvim-cmp, luasnip
-- Treesitter syntax highlighting
-- File explorer: nvim-tree
-- Fuzzy finder: telescope.nvim
-- Status line: lualine.nvim
 
-## Nerd Font Setup
-To render icons in nvim-tree, statusline, etc.:
-1. Go to: https://www.nerdfonts.com/font-downloads
-2. Download and install a full font like JetBrainsMono Nerd Font or FiraCode Nerd Font
-3. Set your terminal to use it
+The `nvim/` folder contains the full config:
 
-✅ Test in terminal:
-```bash
-echo "     "
-```
-If you see icons instead of ?, you're good!
+| Component | Plugin |
+|---|---|
+| Plugin manager | lazy.nvim |
+| LSP | gopls via nvim-lspconfig |
+| Completion | nvim-cmp + luasnip |
+| Syntax | Treesitter |
+| File explorer | nvim-tree |
+| Fuzzy finder | telescope.nvim |
+| Status line | lualine.nvim |
+| Go integration | go.nvim |
 
-## Tmux Integration
-To enable seamless navigation between Tmux and Neovim splits, add this to your ~/.tmux.conf:
-```bash
-ln -sf ~/dotfiles/tmux.conf ~/.tmux.conf
-```
+---
 
-##  License
-MIT — use it, fork it, tweak it!
+## Tmux Configuration
 
+`tmux.conf` includes:
+
+- **Prefix**: `C-a` (replaces default `C-b`)
+- **Mouse**: enabled
+- **True color**: 256-color + `Tc` override for correct colors in Neovim
+- **Escape time**: 10ms (prevents Neovim input lag)
+- **Smart pane navigation**: `C-h/j/k/l` move between tmux panes and Neovim splits transparently
+- **Clipboard**: `y` in copy mode pipes to `pbcopy`
+- **Scrollback**: 10,000 lines
+- **Window/pane numbering**: starts at 1
+
+---
+
+## License
+
+MIT — use it, fork it, tweak it.
