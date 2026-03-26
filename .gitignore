@@ -3,3 +3,6 @@ nvim/lazy/
 
 # accidental nested directory
 nvim/nvim
+
+# Claude Code local data
+.claude/

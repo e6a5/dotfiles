@@ -2,14 +2,13 @@
 -- Centralized keymaps for a clean and consistent setup
 
 local map = vim.keymap.set
-local tb = require('telescope.builtin')
 
 -- FILE MANAGEMENT
 map('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle file explorer' })
-map('n', '<leader>ff', tb.find_files, { desc = 'Find files' })
-map('n', '<leader>fg', tb.live_grep, { desc = 'Search text in files' })
-map('n', '<leader>fb', tb.buffers, { desc = 'List open buffers' })
-map('n', '<leader>fh', tb.help_tags, { desc = 'Search help' })
+map('n', '<leader>ff', function() require('telescope.builtin').find_files() end, { desc = 'Find files' })
+map('n', '<leader>fg', function() require('telescope.builtin').live_grep() end, { desc = 'Search text in files' })
+map('n', '<leader>fb', function() require('telescope.builtin').buffers() end, { desc = 'List open buffers' })
+map('n', '<leader>fh', function() require('telescope.builtin').help_tags() end, { desc = 'Search help' })
 
 -- EDITING & BUFFERS
 map('n', '<leader>w', ':w<CR>', { desc = 'Save file' })
@@ -18,11 +17,7 @@ map('n', '<leader>Q', ':qa<CR>', { desc = 'Quit all' })
 map('n', '<leader>r', ':e!<CR>', { desc = 'Reload current buffer' })
 map('n', '<leader>R', ':checktime<CR>', { desc = 'Check all buffers for changes' })
 
--- LSP (works when an LSP client is attached)
-map('n', 'gd', vim.lsp.buf.definition, { desc = 'Go to definition' })
-map('n', 'K', vim.lsp.buf.hover, { desc = 'Show hover info' })
-map('n', '<leader>rn', vim.lsp.buf.rename, { desc = 'Rename symbol' })
-map('n', '<leader>ca', vim.lsp.buf.code_action, { desc = 'Code action' })
+-- LSP keymaps are set per-buffer in on_attach (init.lua)
 
 -- CLAUDE CODE
 map('n', '<leader>ct', function()
@@ -62,7 +57,7 @@ map('n', '<leader>gc', ':Git commit<CR>', { desc = 'Git commit' })
 map('n', '<leader>gp', ':Git push<CR>',   { desc = 'Git push' })
 
 -- Telescope Git pickers — browse/search
-map('n', '<leader>gS', tb.git_status,   { desc = 'Telescope: git status' })
-map('n', '<leader>gL', tb.git_commits,  { desc = 'Telescope: git log' })
-map('n', '<leader>gB', tb.git_branches, { desc = 'Telescope: git branches' })
-map('n', '<leader>gf', tb.git_files,    { desc = 'Telescope: git files' })
+map('n', '<leader>gS', function() require('telescope.builtin').git_status() end,   { desc = 'Telescope: git status' })
+map('n', '<leader>gL', function() require('telescope.builtin').git_commits() end,  { desc = 'Telescope: git log' })
+map('n', '<leader>gB', function() require('telescope.builtin').git_branches() end, { desc = 'Telescope: git branches' })
+map('n', '<leader>gf', function() require('telescope.builtin').git_files() end,    { desc = 'Telescope: git files' })

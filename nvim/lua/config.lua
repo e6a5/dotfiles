@@ -20,42 +20,15 @@ return {
     end,
   },
   
-  {
-    "neovim/nvim-lspconfig",
-    ft = { "go", "gomod" },
-    config = function()
-      require("lspconfig").gopls.setup({
-        on_attach = function(client, bufnr)
-          print("✅ gopls attached!")
-
-          -- Optional keymaps
-          local opts = { buffer = bufnr }
-          vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-        end,
-        settings = {
-          gopls = {
-            analyses = {
-              unusedparams = true,
-            },
-            staticcheck = true,
-            usePlaceholders = true,
-          },
-        },
-      })
-    end,
-  },
-  
   -- LSP, Treesitter, DAP, and Go plugins: Loaded when a Go filetype is detected
   {
     "ray-x/go.nvim",
     dependencies = {
       "ray-x/guihua.lua", -- Often recommended with go.nvim
-      "neovim/nvim-lspconfig",
       "nvim-treesitter/nvim-treesitter", -- treesitter is a dependency
       "mfussenegger/nvim-dap", -- For debugging
       "leoluz/nvim-dap-go", -- Go debugger adapter
+      "neovim/nvim-lspconfig", -- go.nvim requires this even with lsp_cfg = false
     },
     config = function()
       require("go").setup({
@@ -176,6 +149,33 @@ return {
     end
   },
 
+  -- Git signs in the gutter (+/-/~)
+  {
+    "lewis6991/gitsigns.nvim",
+    config = function()
+      require("gitsigns").setup({
+        signs = {
+          add    = { text = "▎" },
+          change = { text = "▎" },
+          delete = { text = "" },
+        },
+      })
+    end,
+  },
+
+  -- Auto-close brackets, quotes, etc.
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      require("nvim-autopairs").setup({})
+      -- Hook into nvim-cmp so confirmed completions also close pairs
+      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+      local cmp = require("cmp")
+      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+    end,
+  },
+
   -- Other utility plugins
   { "nvim-lua/plenary.nvim" },
   { "nvim-telescope/telescope.nvim", tag = "0.1.5", dependencies = { "nvim-lua/plenary.nvim" } },
@@ -187,7 +187,7 @@ return {
   "hoob3rt/lualine.nvim",
   config = function()
     local function lsp_status()
-      local buf_clients = vim.lsp.get_active_clients({ bufnr = 0 })
+      local buf_clients = vim.lsp.get_clients({ bufnr = 0 })
       if next(buf_clients) == nil then
         return "" -- no LSP attached
       end
