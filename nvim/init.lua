@@ -1,5 +1,5 @@
-
 require("autocmds")
+
 
 
 -- Set <leader> key (optional, but common)
@@ -21,8 +21,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Set some basic options early
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, { command = "checktime" })
+
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.cursorline = true
 vim.opt.mouse = "a"
 vim.opt.clipboard = "unnamedplus"
 vim.opt.termguicolors = true -- Essential for true color themes
@@ -60,20 +64,43 @@ vim.lsp.config('gopls', {
   cmd = { 'gopls' },
   filetypes = { 'go', 'gomod', 'gowork', 'gotmpl' },
   root_markers = { 'go.work', 'go.mod', '.git' },
-  on_attach = function(_, bufnr)
+  on_attach = function(client, bufnr)
     local opts = { buffer = bufnr }
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+    local ok, navic = pcall(require, "nvim-navic")
+    if ok and client.server_capabilities.documentSymbolProvider then
+      navic.attach(client, bufnr)
+    end
   end,
   settings = {
     gopls = {
       analyses = { unusedparams = true },
       staticcheck = true,
       usePlaceholders = true,
+      semanticTokens = true,
     },
   },
 })
 vim.lsp.enable('gopls')
 
+vim.lsp.config('rust_analyzer', {
+  cmd = { 'rust-analyzer' },
+  filetypes = { 'rust' },
+  root_markers = { 'Cargo.toml', '.git' },
+  settings = {
+    ['rust-analyzer'] = {
+      checkOnSave = { command = 'clippy' },
+    },
+  },
+})
+vim.lsp.enable('rust_analyzer')
+
+vim.lsp.config('ts_ls', {
+  cmd = { 'typescript-language-server', '--stdio' },
+  filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+  root_markers = { 'tsconfig.json', 'package.json', '.git' },
+})
+vim.lsp.enable('ts_ls')

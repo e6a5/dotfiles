@@ -16,7 +16,13 @@ return {
       "nvim-tree/nvim-web-devicons",
     },
     config = function()
-      require("nvim-tree").setup({})
+      require("nvim-tree").setup({
+        view = { width = 20 },
+        update_focused_file = {
+          enable = true,
+          update_root = false,
+        },
+      })
     end,
   },
   
@@ -49,11 +55,11 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = { "go", "lua", "vimdoc", "query" },
-        highlight = { enable = true },
-        indent = { enable = false },
-      })
+        require("nvim-treesitter").setup({
+            ensure_installed = { "go", "lua", "vimdoc", "query", "markdown", "markdown_inline", "rust", "typescript", "tsx", "javascript" },
+            highlight = { enable = true },
+            indent = { enable = true },
+        })
     end,
   },
 
@@ -129,7 +135,22 @@ return {
   -- Git signs for visual change indicators (NEW)
  {
    "tpope/vim-fugitive",
-   lazy = false, -- load at startup (tiny plugin, no cost)
+   lazy = false,
+  },
+
+  -- Unified diff/history/conflict viewer
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewFileHistory", "DiffviewToggleFiles" },
+    opts = {
+      enhanced_diff_hl = true,
+      view = {
+        merge_tool = {
+          layout = "diff3_mixed", -- 3-panel: LOCAL | BASE | REMOTE, bottom = working copy
+        },
+      },
+    },
   },
   -- Enhanced notifications (NEW)
   {
@@ -159,8 +180,34 @@ return {
           change = { text = "▎" },
           delete = { text = "" },
         },
+        current_line_blame = true,
+        current_line_blame_opts = {
+          delay = 300,
+          virt_text_pos = "eol",
+        },
       })
     end,
+  },
+
+  -- Comment toggling: gcc (line), gc (visual block)
+  {
+    "numToStr/Comment.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
+  -- Keybinding hints: popup after pausing on <leader>
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = { delay = 500 },
+  },
+
+  -- Diagnostics panel: all errors/warnings in a scrollable list
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = { focus = true },
   },
 
   -- Auto-close brackets, quotes, etc.
@@ -176,9 +223,65 @@ return {
     end,
   },
 
+  -- Inline markdown rendering: styled headers, tables, checkboxes, code blocks
+  {
+    "MeanderingProgrammer/render-markdown.nvim",
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    ft = { "markdown" },
+    opts = {
+      heading = { sign = false },
+      code = { sign = false, width = "block" },
+    },
+  },
+
+  -- Breadcrumb winbar: shows file > package > function above each buffer
+  {
+    "utilyre/barbecue.nvim",
+    dependencies = {
+      "SmiteshP/nvim-navic",
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("barbecue").setup({
+        theme = "tokyonight",
+      })
+    end,
+  },
+
+  -- Habit building: blocks repeated hjkl/arrow keys to force better motions
+  {
+    "m4xshen/hardtime.nvim",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    event = "VeryLazy",
+    opts = { enabled = false },
+  },
+
   -- Other utility plugins
   { "nvim-lua/plenary.nvim" },
-  { "nvim-telescope/telescope.nvim", tag = "0.1.5", dependencies = { "nvim-lua/plenary.nvim" } },
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local actions = require("telescope.actions")
+      local action_state = require("telescope.actions.state")
+      require("telescope").setup({
+        defaults = {
+          mappings = {
+            i = {
+              ["<C-d>"] = function(prompt_bufnr)
+                local entry = action_state.get_selected_entry()
+                actions.close(prompt_bufnr)
+                if entry and entry.value then
+                  vim.cmd("edit " .. entry.value)
+                  vim.cmd("Gdiffsplit")
+                end
+              end,
+            },
+          },
+        },
+      })
+    end,
+  },
   {
     "christoomey/vim-tmux-navigator",
     lazy = false
