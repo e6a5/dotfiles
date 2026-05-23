@@ -21,7 +21,7 @@ map('n', '<leader>fb', function() require('telescope.builtin').buffers() end, { 
 map('n', '<leader>fh', function() require('telescope.builtin').help_tags() end, { desc = 'Search help' })
 
 -- EDITING & BUFFERS
-map('n', '<leader>w', ':w<CR>', { desc = 'Save file' })
+map('n', '<leader>s', ':w<CR>', { desc = 'Save file' })
 map('n', '<leader>q', ':q<CR>', { desc = 'Quit window' })
 map('n', '<leader>Q', ':qa<CR>', { desc = 'Quit all' })
 map('n', '<leader>r', ':e!<CR>', { desc = 'Reload current buffer' })
@@ -30,7 +30,7 @@ map('n', '<leader>R', ':checktime<CR>', { desc = 'Check all buffers for changes'
 -- LSP keymaps are set per-buffer in on_attach (init.lua)
 
 -- LSP navigation (Telescope-powered for multi-result views)
-map('n', 'gr', function() require('telescope.builtin').lsp_references() end,        { desc = 'Find references' })
+map('n', 'gr', function() require('telescope.builtin').lsp_references() end,        { desc = 'Find references', nowait = true })
 map('n', 'gi', function() require('telescope.builtin').lsp_implementations() end,   { desc = 'Find implementations' })
 map('n', '<leader>ds', function() require('telescope.builtin').lsp_document_symbols() end,   { desc = 'Document symbols' })
 map('n', '<leader>ws', function() require('telescope.builtin').lsp_dynamic_workspace_symbols() end, { desc = 'Workspace symbols' })

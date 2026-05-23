@@ -1,5 +1,10 @@
 -- ~/.config/nvim/lua/autocmds.lua
 
+-- Register Go template filetype
+vim.filetype.add({
+  extension = { gotmpl = "gotmpl" },
+})
+
 -- Auto-reload files when Claude Code changes them
 vim.opt.autoread = true
 vim.opt.updatetime = 300

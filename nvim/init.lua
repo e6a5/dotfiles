@@ -43,6 +43,7 @@ require("lazy").setup({
     { import = "config" },
   },
   -- Add any other global lazy.nvim options here
+  rocks = { enabled = false },
   change_detection = {
     notify = false, -- Disable notification for changes in plugins
   },

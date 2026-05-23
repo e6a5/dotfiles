@@ -31,7 +31,6 @@ return {
     "ray-x/go.nvim",
     dependencies = {
       "ray-x/guihua.lua", -- Often recommended with go.nvim
-      "nvim-treesitter/nvim-treesitter", -- treesitter is a dependency
       "mfussenegger/nvim-dap", -- For debugging
       "leoluz/nvim-dap-go", -- Go debugger adapter
       "neovim/nvim-lspconfig", -- go.nvim requires this even with lsp_cfg = false
@@ -48,19 +47,6 @@ return {
     ft = {"go", 'gomod'},
     -- Command to install/update necessary Go binaries used by go.nvim
     build = ':lua require("go.install").update_all_sync()',
-  },
-
-  -- Explicit nvim-treesitter configuration for highlighting and other features
-  {
-    "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    config = function()
-        require("nvim-treesitter").setup({
-            ensure_installed = { "go", "lua", "vimdoc", "query", "markdown", "markdown_inline", "rust", "typescript", "tsx", "javascript" },
-            highlight = { enable = true },
-            indent = { enable = true },
-        })
-    end,
   },
 
   -- Autocompletion: Setup nvim-cmp and its sources
@@ -226,7 +212,7 @@ return {
   -- Inline markdown rendering: styled headers, tables, checkboxes, code blocks
   {
     "MeanderingProgrammer/render-markdown.nvim",
-    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" },
+    dependencies = { "nvim-tree/nvim-web-devicons" },
     ft = { "markdown" },
     opts = {
       heading = { sign = false },

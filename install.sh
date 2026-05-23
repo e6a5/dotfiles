@@ -26,7 +26,8 @@ brew install \
   fd \
   fzf \
   node \
-  tmux || brew link --overwrite node 2>/dev/null || true
+  tmux \
+  tree-sitter-cli || brew link --overwrite node 2>/dev/null || true
 
 echo "✅ System dependencies installed."
 
@@ -64,9 +65,29 @@ nvim --headless "+Lazy! sync" +qa
 echo "✅ Plugins installed."
 
 # ── 7. Treesitter parsers ─────────────────────────────────────────────────────
-echo "🌲 Updating Treesitter parsers..."
-nvim --headless "+TSUpdate" +qa
-echo "✅ Treesitter updated."
+# nvim-treesitter is not a runtime plugin (its master branch is incompatible
+# with Neovim 0.12). We bootstrap it once to compile parsers, copy the .so
+# files to the site/parser directory where Neovim finds them natively, then
+# discard the clone.
+echo "🌲 Installing Treesitter parsers..."
+SITE_PARSER_DIR="${HOME}/.local/share/nvim/site/parser"
+TS_BOOTSTRAP="${HOME}/.local/share/nvim/ts-bootstrap"
+mkdir -p "$SITE_PARSER_DIR" "$TS_BOOTSTRAP"
+
+git clone --quiet --depth 1 \
+  https://github.com/nvim-treesitter/nvim-treesitter \
+  "${TS_BOOTSTRAP}/nvim-treesitter"
+
+PARSERS="go gomod gosum gotmpl gowork html javascript json rust sql tsx typescript yaml"
+
+nvim --headless -u NONE \
+  --cmd "set rtp+=${TS_BOOTSTRAP}/nvim-treesitter" \
+  -c "lua require('nvim-treesitter.configs').setup({ ensure_installed = vim.split('$PARSERS', ' '), sync_install = true })" \
+  +qa 2>/dev/null || true
+
+cp "${TS_BOOTSTRAP}/nvim-treesitter/parser/"*.so "$SITE_PARSER_DIR/" 2>/dev/null || true
+rm -rf "$TS_BOOTSTRAP"
+echo "✅ Treesitter parsers installed."
 
 # ── 8. go.nvim binaries ───────────────────────────────────────────────────────
 echo "🔧 Installing go.nvim tools..."
